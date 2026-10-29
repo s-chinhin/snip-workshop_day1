@@ -23,6 +23,7 @@ its files at the branch root. `main` holds no app code. It mounts each branch as
 | `backend/` | `backend` | Bun API server, zero dependencies |
 | `frontend/` | `frontend` | Angular 19 web app |
 | `cli/` | `cli` | Zero-dependency Node CLI |
+| `bundle/` | `bundle` | **Generated** release: server + built UI + CLI |
 
 ## Clone
 
@@ -58,3 +59,19 @@ git add backend && git commit -m "Bump backend submodule" && git push
 
 The layer commit and the pointer commit are separate. That way `main` is always a
 pinned, reproducible snapshot of the whole app.
+
+## The release bundle
+
+`bundle/` is **generated output**. Don't edit it by hand. `scripts/build-bundle.mjs`
+moves the source submodules to their branch tips, builds the Angular app, and
+assembles one folder: `server.js`, the UI in `public/`, `cli.js`, an `.env` with
+`PUBLIC_DIR=./public`, a `Dockerfile`, and a `railway.json`. It then commits the
+release inside `bundle/` and bumps the pointers on `main`. When nothing changed, it
+commits nothing.
+
+```bash
+node scripts/build-bundle.mjs           # build + commit locally
+node scripts/build-bundle.mjs --push    # ...and push the bundle branch and main
+cd bundle && bun start                  # ONE process: UI + API + redirects on :3000
+docker build -t snip bundle && docker run --rm -p 3000:3000 snip
+```
