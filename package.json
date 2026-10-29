@@ -1,0 +1,11 @@
+{
+  "name": "snip-bundle",
+  "private": true,
+  "description": "Generated Snip release: API + redirects + web UI in one Bun process, plus the CLI",
+  "scripts": {
+    "start": "bun server.js"
+  },
+  "bin": {
+    "snip": "cli.js"
+  }
+}
