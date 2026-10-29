@@ -12,7 +12,10 @@ export interface ShortLink {
 
 @Injectable({ providedIn: 'root' })
 export class LinkService {
-  private readonly endpoint = 'http://localhost:3000/api/links';
+  // On the ng serve dev server (:4200) the API runs separately on :3000; in the
+  // release bundle the same Bun process serves both, so use the page's own origin.
+  private readonly endpoint =
+    window.location.port === '4200' ? 'http://localhost:3000/api/links' : '/api/links';
 
   constructor(private readonly http: HttpClient) {}
 
