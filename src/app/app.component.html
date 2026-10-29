@@ -1,0 +1,60 @@
+<main class="page">
+  <header>
+    <h1>Snip</h1>
+    <p class="muted">Paste a long URL, get a short one.</p>
+  </header>
+
+  <form class="shorten" (submit)="$event.preventDefault(); createLink()">
+    <input
+      type="url"
+      placeholder="https://example.com/a/very/long/link"
+      aria-label="URL to shorten"
+      [value]="url()"
+      (input)="updateUrl($event)"
+      [disabled]="isCreating()"
+      required
+    />
+    <button type="submit" [disabled]="isCreating() || !url().trim()">
+      {{ isCreating() ? 'Shortening…' : 'Shorten' }}
+    </button>
+  </form>
+
+  @if (formError()) {
+    <p class="notice error" role="alert">{{ formError() }}</p>
+  }
+  @if (createdLink(); as link) {
+    <p class="notice success">
+      Short link: <a [href]="link.shortUrl" target="_blank" rel="noopener">{{ link.shortUrl }}</a>
+    </p>
+  }
+
+  <section>
+    <div class="section-head">
+      <h2>Links</h2>
+      <button type="button" class="ghost" (click)="refreshLinks()" [disabled]="isRefreshing()">
+        {{ isRefreshing() ? 'Refreshing…' : 'Refresh' }}
+      </button>
+    </div>
+
+    @if (listError()) {
+      <p class="notice error" role="alert">{{ listError() }}</p>
+    } @else if (links().length === 0) {
+      <p class="muted">No links yet.</p>
+    } @else {
+      <table>
+        <thead>
+          <tr><th>Code</th><th>Original URL</th><th class="num">Hits</th></tr>
+        </thead>
+        <tbody>
+          @for (link of links(); track link.code) {
+            <tr>
+              <td><a [href]="link.shortUrl" target="_blank" rel="noopener">{{ link.code }}</a></td>
+              <td class="url" [title]="link.url">{{ link.url }}</td>
+              <td class="num">{{ link.hits }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </section>
+</main>
