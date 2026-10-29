@@ -1,0 +1,12 @@
+{
+  "name": "snip-cli",
+  "version": "1.0.0",
+  "description": "Zero-dependency terminal client for the Snip URL shortener",
+  "bin": {
+    "snip": "cli.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT"
+}
