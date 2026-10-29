@@ -1,0 +1,42 @@
+name: Build bundle
+
+# Rebuilds the generated bundle branch from the backend/frontend/cli branch tips.
+#
+# There is deliberately no `push` trigger: GitHub runs a push workflow from the
+# workflow file on the branch that was pushed, and this file only exists on main,
+# so pushes to backend/frontend/cli would never fire it. An hourly schedule picks
+# those changes up instead; the build script is a no-op when nothing changed.
+# Note: scheduled workflows only run from the repository's default branch.
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-bundle
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          submodules: true
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Configure git identity
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Build and push bundle
+        run: node scripts/build-bundle.mjs --push
